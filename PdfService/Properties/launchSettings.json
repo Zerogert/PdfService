@@ -19,8 +19,7 @@
     "PdfService": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "weatherforecast",
-      "applicationUrl": "http://localhost:9000",
+      "applicationUrl": "http://localhost:9123",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
