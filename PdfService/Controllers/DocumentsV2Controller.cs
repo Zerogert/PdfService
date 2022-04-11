@@ -13,8 +13,8 @@ namespace PdfService.Controllers {
 	[ApiController]
 	[Route("[controller]")]
 	public class DocumentsV2Controller: ControllerBase {
-		private readonly LaunchOptions _browserOptions = new LaunchOptions { Headless = true, ExecutablePath = @"C:\Users\Zeroget\Downloads\chrome-win\chrome-win\chrome.exe", Args = new string[] { "--no-sandbox" } };
-		//private readonly LaunchOptions _browserOptions = new LaunchOptions { Headless = true, ExecutablePath = @"/usr/bin/chromium-browser", Args = new string[] { "--no-sandbox" } };
+		//private readonly LaunchOptions _browserOptions = new LaunchOptions { Headless = true, ExecutablePath = @"C:\Users\Zeroget\Downloads\chrome-win\chrome-win\chrome.exe", Args = new string[] { "--no-sandbox" } };
+		private readonly LaunchOptions _browserOptions = new LaunchOptions { Headless = true, ExecutablePath = @"/usr/bin/chromium-browser", Args = new string[] { "--no-sandbox" } };
 		private static Browser s_browser = null;
 
 		private readonly ILogger<DocumentsV2Controller> _logger;
