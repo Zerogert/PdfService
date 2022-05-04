@@ -23,6 +23,7 @@ namespace PdfService.Controllers {
 			return File(await GeneratePdfAsync(url, landscape), "application/pdf");
 		}
 
+		[NonAction]
 		public async Task<Stream> GeneratePdfAsync(string url, bool landscape) {
 			var browser = await _browser.Get();
 			using (var page = await browser.NewPageAsync()) {
