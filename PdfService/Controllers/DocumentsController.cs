@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PdfService.Interfaces;
 using PuppeteerSharp;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,9 +11,11 @@ namespace PdfService.Controllers {
 	public class DocumentsController: ControllerBase {
 
 		private readonly ILogger<DocumentsController> _logger;
+		private readonly IBrowserResolver _browser;
 
-		public DocumentsController(ILogger<DocumentsController> logger) {
+		public DocumentsController(ILogger<DocumentsController> logger, IBrowserResolver browser) {
 			_logger = logger;
+			_browser = browser;
 		}
 
 		[HttpGet]
@@ -20,9 +23,8 @@ namespace PdfService.Controllers {
 			return File(await GeneratePdfAsync(url, landscape), "application/pdf");
 		}
 
-		public static async Task<Stream> GeneratePdfAsync(string url, bool landscape) {
-			var options = new LaunchOptions { Headless = true, ExecutablePath = @"/usr/bin/chromium-browser", Args = new string[] { "--no-sandbox" } };
-			using (var browser = await Puppeteer.LaunchAsync(options))
+		public async Task<Stream> GeneratePdfAsync(string url, bool landscape) {
+			var browser = await _browser.Get();
 			using (var page = await browser.NewPageAsync()) {
 				await page.GoToAsync(url);
 				return await page.PdfStreamAsync(new PdfOptions() { Format = PuppeteerSharp.Media.PaperFormat.A4, Landscape = landscape, OmitBackground = true, PrintBackground = true });

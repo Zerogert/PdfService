@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PdfService.Interfaces;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
@@ -13,14 +14,11 @@ namespace PdfService.Controllers {
 	[ApiController]
 	[Route("[controller]")]
 	public class DocumentsV2Controller: ControllerBase {
-		//private readonly LaunchOptions _browserOptions = new LaunchOptions { Headless = true, ExecutablePath = @"C:\Users\Zeroget\Downloads\chrome-win\chrome-win\chrome.exe", Args = new string[] { "--no-sandbox" } };
-		private readonly LaunchOptions _browserOptions = new LaunchOptions { Headless = true, ExecutablePath = @"/usr/bin/chromium-browser", Args = new string[] { "--no-sandbox" } };
-		private static Browser s_browser = null;
-
 		private readonly ILogger<DocumentsV2Controller> _logger;
-
-		public DocumentsV2Controller(ILogger<DocumentsV2Controller> logger) {
+		private readonly IBrowserResolver _browser;
+		public DocumentsV2Controller(IBrowserResolver browser, ILogger<DocumentsV2Controller> logger) {
 			_logger = logger;
+			_browser = browser;
 		}
 
 		[HttpPost("byUrl")]
@@ -41,10 +39,10 @@ namespace PdfService.Controllers {
 
 		[NonAction]
 		public async Task<List<string>> GeneratePdfAsync(List<IFormFile> streams, bool landscape) {
-			s_browser ??= await Puppeteer.LaunchAsync(_browserOptions);
+			var browser = await _browser.Get();
 			var tasks = streams.Select(async x => {
 				using (StreamReader stringReader = new StreamReader(x.OpenReadStream()))
-				using (var page = await s_browser.NewPageAsync()) {
+				using (var page = await browser.NewPageAsync()) {
 					await page.SetContentAsync(await stringReader.ReadToEndAsync());
 					var fileName = $"{Guid.NewGuid()}.pdf";
 					await page.PdfAsync($"{Directory.GetCurrentDirectory()}/files/{fileName}", new PdfOptions() { Format = PuppeteerSharp.Media.PaperFormat.A4, Landscape = landscape, OmitBackground = true, PrintBackground = true });
@@ -58,9 +56,9 @@ namespace PdfService.Controllers {
 
 		[NonAction]
 		public async Task<List<string>> GeneratePdfAsync(List<string> url, bool landscape) {
-			s_browser ??= await Puppeteer.LaunchAsync(_browserOptions);
+			var browser = await _browser.Get();
 			var tasks = url.Select(async x => {
-				using (var page = await s_browser.NewPageAsync()) {
+				using (var page = await browser.NewPageAsync()) {
 					await page.GoToAsync(x);
 					var fileName = $"{Guid.NewGuid()}.pdf";
 					await page.PdfAsync($"{Directory.GetCurrentDirectory()}/files/{fileName}", new PdfOptions() { Format = PuppeteerSharp.Media.PaperFormat.A4, Landscape = landscape, OmitBackground = true, PrintBackground = true });

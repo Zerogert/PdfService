@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using PdfService.Interfaces;
+using PdfService.Services;
 using System.IO;
 
 namespace PdfService {
@@ -18,6 +20,7 @@ namespace PdfService {
 		public void ConfigureServices(IServiceCollection services) {
 			services.AddControllers();
 			services.AddSwaggerGen();
+			services.AddSingleton<IBrowserResolver, BrowserResolver>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
